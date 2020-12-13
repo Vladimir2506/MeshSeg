@@ -5,16 +5,14 @@ bool IsConvex(const NormalType& n1, const PointType& p1, const PointType& p2)
 	return n1.dot(p1 - p2) < LBND_FLT;
 }
 
-float GetGeodesicDistance(const NormalType& n1, const NormalType& n2, const PointType& p1, const PointType& p2)
+float GetGeodesicDistance(const PointType& p1, const PointType& p2, const PointType& t, const PointType& s)
 {
-	auto P1P2 = p1 - p2;
-	auto nn1 = n1.norm(), nn2 = n2.norm();
-	auto cosAlpha = n1.dot(P1P2) / P1P2.norm(), cosBeta = -n2.dot(P1P2) / P1P2.norm();
+	auto ts = s - t, p1t = p1 - t, p2t = p2 - t;
+	auto cosAlpha = p1t.dot(ts) / (ts.norm() * p1t.norm()), cosBeta = p2t.dot(ts) / (ts.norm() * p2t.norm());
 	auto alpha = std::acos(cosAlpha), beta = std::acos(cosBeta);
-	auto sinAlphaBeta = std::sin(alpha + beta);
-	auto x = P1P2.norm() * (cosAlpha + cosBeta) / sinAlphaBeta;
-	auto delta = std::abs(x - P1P2.norm());
-	return x;
+	auto cosAlphaBeta = std::cos(alpha + beta);
+	auto x = p1t.sqrnorm() + p2t.sqrnorm() - 2 * p1t.norm() * p2t.norm() * cosAlphaBeta;
+	return std::sqrt(x);
 }
 
 float GetAngleDistance(const NormalType& n1, const NormalType& n2, const PointType& p1, const PointType& p2)
