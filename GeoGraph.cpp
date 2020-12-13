@@ -18,14 +18,27 @@ GeoGraph::GeoGraph(const MeshType &mesh, float delta)
 		auto centroidI = mesh.calc_face_centroid(faceI);
 		auto normalVecI = mesh.calc_normal(faceI);
 
+		const auto &edgesISet = faceI.edges().to_set();
+
 		for (const auto& faceJ : faceI.faces())
 		{
 			int indexJ = faceJ.idx();
+			const auto &edgesJ = faceJ.edges();
+			OpenMesh::SmartEdgeHandle e;
+
+			for (const auto& ej : edgesJ)
+			{
+				if (edgesISet.contains(ej))
+				{
+					e = ej;
+					break;
+				}
+			}
 
 			auto centroidJ = mesh.calc_face_centroid(faceJ);
 			auto normalVecJ = mesh.calc_normal(faceJ);
 
-			float geodIJ = GetGeodesicDistance(normalVecI, normalVecJ, centroidI, centroidJ);
+			float geodIJ = GetGeodesicDistance(centroidI, centroidJ, mesh.point(e.v0()), mesh.point(e.v1()));
 			float angDistIJ = GetAngleDistance(normalVecI, normalVecJ, centroidI, centroidJ);
 
 			this->dualVerts[indexI][indexJ] = NeighborTraits {angDistIJ, geodIJ, UBND_FLT};
@@ -43,7 +56,7 @@ GeoGraph::GeoGraph(const MeshType &mesh, float delta)
 		for (auto &kv : this->dualVerts[i])
 		{
 			int j = kv.first;
-			kv.second.dist = kv.second.geoDist * delta / avgGeod + kv.second.angDist * (1.0 - delta) / avgAngd;
+			kv.second.dist = kv.second.geoDist * delta / avgGeod + kv.second.angDist * (1.0f - delta) / avgAngd;
 			this->minDistMatrix[i][j] = kv.second.dist;
 			this->minDistMatrix[j][i] = kv.second.dist;
 		}
