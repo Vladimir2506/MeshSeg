@@ -4,6 +4,23 @@
 
 #include "APSPCuda.cuh"
 
+void naiveFW(const std::unique_ptr<graphAPSPTopology>& data) {
+    float newPath = 0.0f;
+    int n = data->nvertex;
+
+    for (int u = 0; u < n; ++u) {
+        for (int v1 = 0; v1 < n; ++v1) {
+            for (int v2 = 0; v2 < n; ++v2) {
+                newPath = data->graph[v1 * n + u] + data->graph[u * n + v2];
+                if (data->graph[v1 * n + v2] > newPath) {
+                    data->graph[v1 * n + v2] = newPath;
+                    data->pred[v1 * n + v2] = data->pred[u * n + v2];
+                }
+            }
+        }
+    }
+}
+
 /**
  * CUDA handle error, if error occurs print message and exit program
 *

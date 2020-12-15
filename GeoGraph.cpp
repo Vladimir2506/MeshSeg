@@ -1,7 +1,7 @@
 #include "GeoGraph.h"
 #include "APSPCuda.cuh"
 
-GeoGraph::GeoGraph(const MeshType &mesh, float delta)
+GeoGraph::GeoGraph(const MeshType &mesh, float delta, float eta)
 {
 	// Initialization of variables.
 	this->numVerts = mesh.n_faces();
@@ -39,7 +39,7 @@ GeoGraph::GeoGraph(const MeshType &mesh, float delta)
 			auto normalVecJ = mesh.calc_normal(faceJ);
 
 			float geodIJ = GetGeodesicDistance(centroidI, centroidJ, mesh.point(e.v0()), mesh.point(e.v1()));
-			float angDistIJ = GetAngleDistance(normalVecI, normalVecJ, centroidI, centroidJ);
+			float angDistIJ = GetAngleDistance(normalVecI, normalVecJ, centroidI, centroidJ, eta);
 
 			this->dualVerts[indexI][indexJ] = NeighborTraits {angDistIJ, geodIJ, UBND_FLT};
 
@@ -65,7 +65,7 @@ GeoGraph::GeoGraph(const MeshType &mesh, float delta)
 }
 
 
-std::vector<std::vector<float>> GeoGraph::RunShortestPath()
+std::vector<std::vector<float>> GeoGraph::RunShortestPath(bool cuda)
 {
 	// Wrapper for the CUDA APSP.
 	std::unique_ptr<graphAPSPTopology> proxy = std::unique_ptr<graphAPSPTopology>(new graphAPSPTopology(this->numVerts));
@@ -79,7 +79,14 @@ std::vector<std::vector<float>> GeoGraph::RunShortestPath()
 		}
 	}
 
-	cudaBlockedFW(proxy);
+	if (cuda)
+	{
+		cudaBlockedFW(proxy);
+	}
+	else
+	{
+		naiveFW(proxy);
+	}
 
 	for (size_t i = 0; i < this->numVerts; ++i)
 	{

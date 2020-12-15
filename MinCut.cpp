@@ -124,6 +124,9 @@ void MinCut::FFFlowGraph(const std::vector<UnsurePoint>& pts, const int cls1, co
             }
         }
     }
+    this->vcax = vca;
+    this->vcbx = vcb;
+    this->vcx = vc;
 
     int V = vc.size() + vca.size() + vcb.size();
     std::vector<int> verts(V);
@@ -156,7 +159,7 @@ void MinCut::FFFlowGraph(const std::vector<UnsurePoint>& pts, const int cls1, co
             {
                 const auto& n2 = mesh.calc_face_normal(faceJ);
                 const auto& p2 = mesh.calc_face_centroid(faceJ);
-                float ad = GetAngleDistance(n1, n2, p1, p2);
+                float ad = GetAngleDistance(n1, n2, p1, p2, this->eta);
                 adSum += ad;
                 adDen += 1;
                 flows[i][j] = flows[j][i] = ad;
@@ -254,10 +257,11 @@ void MinCut::FFFlowGraph(const std::vector<UnsurePoint>& pts, const int cls1, co
     }
 }
 
-MinCut::MinCut(const std::vector<std::vector<float>>& p, const float eps, const MeshType& m)
+MinCut::MinCut(const std::vector<std::vector<float>>& p, float eps, const MeshType& m, float eta)
     : mesh(m), prob(p)
 {
     this->epsilon = eps;
+    this->eta = eta;
     this->totalVertices = prob.size();
     this->totalCategories = prob[0].size();
 

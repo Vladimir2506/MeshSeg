@@ -31,4 +31,4 @@ public:
 
 bool IsConvex(const NormalType& n1, const PointType& p1, const PointType& p2);
 float GetGeodesicDistance(const PointType& p1, const PointType& p2, const PointType& t, const PointType& s);
-float GetAngleDistance(const NormalType& n1, const NormalType& n2, const PointType& p1, const PointType& p2);
+float GetAngleDistance(const NormalType& n1, const NormalType& n2, const PointType& p1, const PointType& p2, float eta);

@@ -17,7 +17,7 @@ private:
 	size_t numVerts;
 
 public:
-	GeoGraph(const MeshType &mesh, float delta);
-	std::vector<std::vector<float>>  RunShortestPath();
+	GeoGraph(const MeshType &mesh, float delta, float eta);
+	std::vector<std::vector<float>>  RunShortestPath(bool cuda);
 };
 

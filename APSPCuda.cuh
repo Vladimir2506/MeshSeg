@@ -42,5 +42,6 @@ void cudaNaiveFW(const std::unique_ptr<graphAPSPTopology>& dataHost);
  */
 void cudaBlockedFW(const std::unique_ptr<graphAPSPTopology>& dataHost);
 
+void naiveFW(const std::unique_ptr<graphAPSPTopology>& data);
 
 #endif /* _APSP_ */

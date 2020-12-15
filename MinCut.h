@@ -19,6 +19,7 @@ private:
 	int totalVertices;
 	int totalCategories;
 	float epsilon;
+	float eta;
 	std::vector<std::vector<UnsurePoint>> allRefines;
 	std::vector<std::set<int>> fuzzyLabels;
 	std::vector<int> labels;
@@ -27,7 +28,8 @@ private:
 	void FFFlowGraph(const std::vector<UnsurePoint>& pts, int cls1, int cls2);
 	
 public:
-	MinCut(const std::vector<std::vector<float>>& p, const float eps, const MeshType& m);
+	MinCut(const std::vector<std::vector<float>>& p, float eps, const MeshType& m, float eta);
 	void Execute();
 	std::vector<int> GetLabels();
+	std::unordered_set<int> vcx, vcax, vcbx;
 };
